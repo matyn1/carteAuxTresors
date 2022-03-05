@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CarteAuxTresors": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\mmatyn\\source\\repos\\CarteAuxTresors\\CarteAuxTresors\\Entry.txt\""
+    }
+  }
+}
