@@ -9,14 +9,30 @@ namespace CarteAuxTresors.Helpers
     /// <summary>A class that handle the game.</summary>
     public static class GameHelper
     {
+        /// <summary>The map.</summary>
         public static Map Map { get; set; }
+
+        /// <summary>A list of Mountain.</summary>
         public static IList<Mountain> Mountains { get; set; } = new List<Mountain>();
+
+        /// <summary>A list of Treasure.</summary>
         public static IList<Treasure> Treasures { get; set; } = new List<Treasure>();
+
+        /// <summary>A list of Adventurer.</summary>
         public static IList<Adventurer> Adventurers { get; set; } = new List<Adventurer>();
+
+        /// <summary>Clears all models.</summary>
+        public static void ResetGame()
+        {
+            Map = null;
+            Mountains.Clear();
+            Treasures.Clear();
+            Adventurers.Clear();
+        }
 
         /// <summary>Initializes all models necessary for "La carte aux trésors".</summary>
         /// <param name="filePath">Path of the entry file.</param>
-        /// <returns>False if there is no Map in the file, otherwise true.</returns>
+        /// <returns>False if there is no Map in the file and no adventurer, otherwise true.</returns>
         public static bool InitializeGame(string filePath)
         {
             var lines = FileHelper.ParseFileEntry(filePath);
@@ -30,8 +46,8 @@ namespace CarteAuxTresors.Helpers
                 switch (lineSplitted[0])
                 {
                     case "C":
-                        if (int.TryParse(lineSplitted[1], out int witdh) && int.TryParse(lineSplitted[2], out int length))
-                            Map = new Map(witdh, length);
+                        if (int.TryParse(lineSplitted[1], out int width) && int.TryParse(lineSplitted[2], out int height))
+                            Map = new Map(width, height);
                         break;
                     case "M":
                         if (int.TryParse(lineSplitted[1], out int mountainX) && int.TryParse(lineSplitted[2], out int mountainY) &&
@@ -102,25 +118,25 @@ namespace CarteAuxTresors.Helpers
             }
         }
 
-        /// <summary>Checks if the adventurer can go to the next position</summary>
-        /// <param name="nextPosition">The next position</param>
-        /// <returns>True if the next position is in the Map and if there is no mountains or no player; otherwise false.</returns>
-        public static bool IsPositionAuthorized((int X, int Y) nextPosition)
+        /// <summary>Checks if the position is authorized.</summary>
+        /// <param name="position">The position to test.</param>
+        /// <returns>True if the position is in the Map and if there is no mountains or no player; otherwise false.</returns>
+        public static bool IsPositionAuthorized((int X, int Y) position)
         {
-            return !IsOutOfMap(nextPosition) && IsPositionAvailable(nextPosition);
+            return !IsOutOfMap(position) && IsPositionAvailable(position);
         }
 
-        /// <summary>Checks if the position is occupied by an adventurer or a mountain.</summary>
+        /// <summary>Checks if the position is out of the map.</summary>
         /// <param name="position">The position to test.</param>
-        /// <returns>True if the position is occupied; otherwise false</returns>
+        /// <returns>True if the position is out of the map; otherwise false.</returns>
         public static bool IsOutOfMap((int X, int Y) position)
         {
-            return position.X > Map.Width - 1 || position.X < 0 || position.Y > Map.Height - 1 || position.Y < 0;
+            return position.X > Map?.Width - 1 || position.X < 0 || position.Y > Map?.Height - 1 || position.Y < 0;
         }
 
-        /// <summary>Checks if the position is occupied by an adventurer or a mountain.</summary>
+        /// <summary>Checks if the position is available. No adventurer or no mountain.</summary>
         /// <param name="position">The position to test.</param>
-        /// <returns>True if the position is occupied; otherwise false</returns>
+        /// <returns>True if the position is available; otherwise false</returns>
         public static bool IsPositionAvailable((int X, int Y) position)
         {
             return !Mountains.Any(mountain => mountain.Position == position) && !Adventurers.Any(adventurer => adventurer.Position == position);

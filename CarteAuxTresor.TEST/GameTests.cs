@@ -1,7 +1,9 @@
 ﻿using CarteAuxTresors.Helpers;
 using CarteAuxTresors.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace CarteAuxTresor.TEST
@@ -9,9 +11,33 @@ namespace CarteAuxTresor.TEST
     [TestClass]
     public class GameTest
     {
+
+        [TestMethod]
+        public void InitializeGameTest()
+        {
+            var directoryfolder = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\.."));
+
+            string filePath = Path.Combine(directoryfolder, "EntryTestNoMap.txt");
+            Assert.IsFalse(GameHelper.InitializeGame(filePath));
+
+            GameHelper.ResetGame();
+            filePath = Path.Combine(directoryfolder, "EntryTestNoAdventurer.txt");
+            Assert.IsFalse(GameHelper.InitializeGame(filePath));
+
+            GameHelper.ResetGame();
+            filePath = Path.Combine(directoryfolder, "EntryTestAdventurerInMountain.txt");
+            Assert.IsFalse(GameHelper.InitializeGame(filePath));
+
+            GameHelper.ResetGame();
+            filePath = Path.Combine(directoryfolder, "EntryTest.txt");
+            Assert.IsTrue(GameHelper.InitializeGame(filePath));
+        }
+
         [TestMethod]
         public void CalculateNextPositionTest()
         {
+            GameHelper.ResetGame();
+
             var sequence = new List<char> { 'A' };
             var adventurer = new Adventurer(1, 1, "Indiana Johns", OrientationEnum.N, sequence);
 
@@ -34,6 +60,8 @@ namespace CarteAuxTresor.TEST
         [TestMethod]
         public void IsPositionAuthorizedTest()
         {
+            GameHelper.ResetGame();
+
             GameHelper.Map = new Map(3, 3);
 
             var sequence = new List<char> { 'A' };
@@ -52,11 +80,20 @@ namespace CarteAuxTresor.TEST
 
             nextPosition = GameHelper.CalculateNextPosition(adventurer);
             Assert.IsTrue(GameHelper.IsPositionAuthorized(nextPosition));
+
+            adventurer.Position = (2, 0);
+            adventurer.Orientation = OrientationEnum.E;
+
+            nextPosition = GameHelper.CalculateNextPosition(adventurer);
+            Assert.IsFalse(GameHelper.IsPositionAuthorized(nextPosition));
+
         }
 
         [TestMethod]
         public void RetrieveTreasureTest()
         {
+            GameHelper.ResetGame();
+
             GameHelper.Map = new Map(3, 3);
 
             var sequence = new List<char> { 'A' };
